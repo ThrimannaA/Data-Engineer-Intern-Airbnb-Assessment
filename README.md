@@ -126,6 +126,22 @@ jupyter notebook notebooks/04_price_prediction.ipynb
 ```bash
 streamlit run dashboard/app.py
 ```
+## Dashboard Demo
+
+A demonstration video of the interactive Streamlit dashboard is available below:
+
+**Demo Video:**
+[Watch Dashboard Demo](https://drive.google.com/file/d/1i7sESTA_APfy8OUfjv5Fu8R9fkVmqei9/view?usp=sharing)
+
+The video showcases:
+
+* City selection (NYC, Barcelona, Edinburgh)
+* Market overview metrics
+* Price distribution analysis
+* Room type distribution
+* Neighbourhood-level insights
+* Rating distribution
+* Cross-city radar comparison
 
 # Analysis Workflow
 
