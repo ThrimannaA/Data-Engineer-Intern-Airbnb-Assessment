@@ -269,9 +269,30 @@ for city, data in all_data.items():
 st.sidebar.markdown("---")
 st.sidebar.markdown("### 📝 About")
 st.sidebar.markdown("""
-Data sourced from Inside Airbnb.  
-Dashboard for Expernetic Assessment.
+**Data Source**  
+[Inside Airbnb](https://insideairbnb.com/)
+
+**Cities Analyzed**  
+• New York City (NYC)  
+• Barcelona  
+• Edinburgh  
+
+**Key Features**  
+• 📊 Real-time market metrics  
+• 📈 Interactive visualizations  
+• 🌍 Cross-city comparison  
+
+
+**Tech Stack**   
+• Python  
+• SQLite  
+• Streamlit 
+• Pandas  
+• SQL  
+• plotly  
 """)
+
+st.sidebar.markdown("---")
 
 # Main content
 city_data = all_data[selected_city]
@@ -550,12 +571,3 @@ if comparison_data:
 else:
     st.info("No comparison data available")
 
-
-# Debug info (only in development)
-if st.sidebar.checkbox("Show Debug Info"):
-    st.sidebar.markdown("---")
-    st.sidebar.markdown("### 🐛 Debug Info")
-    st.sidebar.write("Data keys:", list(all_data.keys()))
-    for city, data in all_data.items():
-        if data:
-            st.sidebar.write(f"{city}: {list(data.keys()) if data else 'Empty'}")
