@@ -38,7 +38,7 @@ This document summarizes all completed and incomplete work for the Expernetic Ta
 
 | Section | Status | Details |
 |---------|--------|---------|
-| **Interactive Dashboard** | ✅ Complete |  Deployed and locally runnable dashboard application |
+| **Interactive Dashboard** | ✅ Complete |  Locally runnable dashboard application |
 | **Pipeline Architecture Diagram** | ✅ Complete | Full pipeline architecture |
 
 ---
