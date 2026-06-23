@@ -267,10 +267,10 @@ The complete analysis is documented in `reports/final_report.pdf`, including:
 
 Additional supporting documentation is available in:
 
-* reports/ai_disclosure.pdf – AI tool usage disclosure
-* reports/assumptions.pdf – Data assumptions and constraints
-* reports/completed_work.pdf – Work summary and prioritization rationale
-* reports/decision_log.pdf – Engineering decisions and trade-offs
+* `reports/ai_disclosure.pdf` – AI tool usage disclosure
+* `reports/assumptions.pdf` – Data assumptions and constraints
+* `reports/completed_work.pdf` – Work summary and prioritization rationale
+* `reports/decision_log.pdf` – Engineering decisions and trade-offs
 ---
 
 
