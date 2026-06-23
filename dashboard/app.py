@@ -278,7 +278,7 @@ st.sidebar.markdown("""
 • Edinburgh  
 
 **Key Features**  
-• 📊 Real-time market metrics  
+• 📊 Real-time market metrics  git push -u origin main --force
 • 📈 Interactive visualizations  
 • 🌍 Cross-city comparison  
 
