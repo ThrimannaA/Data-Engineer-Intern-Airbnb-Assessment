@@ -1,0 +1,108 @@
+
+    <!DOCTYPE html>
+    <html>
+    <head><meta charset="UTF-8">
+    <style>
+        body { font-family: Times New Roman; margin: 1in; line-height: 1.6; }
+        h1 { color: #FF5A5F; border-bottom: 2px solid #FF5A5F; }
+        table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+        th, td { border: 1px solid #ddd; padding: 8px; }
+        th { background-color: #FF5A5F; color: white; }
+    </style>
+    </head>
+    <body><h1>Assumptions Document</h1>
+<h2>Data Quality Assumptions</h2>
+<h3>1. Price Field</h3>
+<p><strong>Assumption:</strong> The <code>price</code> column in listings and calendar files contains USD amounts with <code>$</code> prefix and comma separators</p>
+<p><strong>Implication:</strong> Must strip <code>$</code> and <code>,</code> before converting to numeric</p>
+<p><strong>Validation:</strong> After cleaning, ensure no negative prices and reasonable ranges</p>
+<p><strong>Treatment:</strong> Negative or zero prices will be flagged as invalid and handled with explicit nulls</p>
+<h3>2. Availability Dates</h3>
+<p><strong>Assumption:</strong> Calendar data covers 365 days from the snapshot date</p>
+<p><strong>Implication:</strong> Availability_365 should match sum of available calendar days</p>
+<p><strong>Validation:</strong> Check consistency between <code>availability_365</code> and calendar counts</p>
+<p><strong>Treatment:</strong> If mismatch &gt;5%, investigate and document</p>
+<h3>3. Missing Values'</h3>
+<p><strong>Assumption:</strong> Missing values represent unknown information rather than meaningful categories</p>
+<p><strong>Implication:</strong> Explicit nulls will be used rather than imputation in most cases</p>
+<p><strong>Validation:</strong> High null rates in review scores may indicate newer listings</p>
+<p><strong>Treatment:</strong> Nulls preserved as <code>NULL</code> in star schema; analysts can decide imputation strategy</p>
+<h3>4. Host Information</h3>
+<p><strong>Assumption:</strong> Host data (response_rate, host_since) is as reported and current</p>
+<p><strong>Implication:</strong> Older records may have less accurate host information</p>
+<p><strong>Validation:</strong> Compare host_tenure calculations with host_since dates</p>
+<p><strong>Treatment:</strong> Host_since before snapshot date is validated; impossible dates flagged</p>
+<h3>5. Neighbourhood Mapping</h3>
+<p><strong>Assumption:</strong> Neighbourhood names are consistent across files</p>
+<p><strong>Implication:</strong> Joins on neighbourhood name should be exact matches</p>
+<p><strong>Validation:</strong> Check for misspellings or variations (e.g., "Harlem" vs "Central Harlem")</p>
+<p><strong>Treatment:</strong> Fuzzy matching for small discrepancies; manual review for major differences</p>
+<h3>6. Review Scores</h3>
+<p><strong>Assumption:</strong> Review scores are out of 10 (overall rating system)</p>
+<p><strong>Implication:</strong> Scores can be compared meaningfully across listings</p>
+<p><strong>Validation:</strong> Check score distribution for expected patterns (typically 4.0-5.0)</p>
+<p><strong>Treatment:</strong> Scores outside expected range flagged for investigation</p>
+<h3>7. City Snapshot Dates</h3>
+<p><strong>Assumption:</strong> All files for a city come from the same snapshot date</p>
+<p><strong>Implication:</strong> Data is consistent within each city dataset</p>
+<p><strong>Validation:</strong> Check file timestamps and data recency</p>
+<p><strong>Treatment:</strong> If dates differ, note in decision log</p>
+<h3>8. Regulatory Context</h3>
+<p><strong>Assumption:</strong> Regulatory impacts (NYC Local Law 18, Barcelona 2028 ban) are reflected in market dynamics</p>
+<p><strong>Implication:</strong> Analysis should examine whether these regulations correlate with observable patterns</p>
+<p><strong>Validation:</strong> Compare trends before/after key regulatory dates where data allows</p>
+<p><strong>Treatment:</strong> Regulatory analysis is qualitative and contextual, not causal</p>
+<h2>Data Processing Assumptions</h2>
+<h3>9. Cross-City Harmonization</h3>
+<p><strong>Assumption:</strong> Column names and types are similar enough across cities to harmonize</p>
+<p><strong>Implication:</strong> Can build unified pipeline with mapping for minor differences</p>
+<p><strong>Validation:</strong> Schema comparison conducted in notebook</p>
+<p><strong>Treatment:</strong> Differences documented in decision log</p>
+<h3>10. Star Schema Implementation</h3>
+<p><strong>Assumption:</strong> Analytical queries are best served by dimensional model</p>
+<p><strong>Implication:</strong> Denormalization decisions balance query performance vs storage</p>
+<p><strong>Validation:</strong> Query performance tested with representative use cases</p>
+<p><strong>Treatment:</strong> Trade-offs documented and indexed appropriately</p>
+<h2>Business Context Assumptions</h2>
+<h3>11. Calendar as Occupancy Proxy</h3>
+<p><strong>Assumption:</strong> Unavailable nights in calendar represent booked nights</p>
+<p><strong>Implication:</strong> Revenue estimates = price × nights_unavailable</p>
+<p><strong>Validation:</strong> Compare with review counts as demand proxy</p>
+<p><strong>Treatment:</strong> Explicitly caveat in analysis</p>
+<h3>12. Market Definition</h3>
+<p><strong>Assumption:</strong> Each city is a distinct market with own dynamics</p>
+<p><strong>Implication:</strong> Cross-city comparisons need normalization</p>
+<p><strong>Validation:</strong> Market concentration and supply characteristics compared</p>
+<p><strong>Treatment:</strong> Report suggests areas for deeper investigation</p>
+<h2>Limitations</h2>
+<ol>
+<li><strong>No Transaction Data:</strong> Calendar availability is a proxy, not actual bookings</li>
+<li><strong>Snapshot Nature:</strong> Quarterly snapshots miss continuous dynamics</li>
+<li><strong>Potential Scraping Artifacts:</strong> Data quality may vary by snapshot</li>
+<li><strong>Missing Historical Context:</strong> Only current snapshot available</li>
+<li><strong>Regulatory Attribution:</strong> Cannot establish causation between regulations and market changes</li>
+<li><strong>Platform Changes:</strong> Airbnb policy changes not captured</li>
+<li><strong>Guest Demographics:</strong> No data on who books or for what purpose</li>
+<li><strong>Competitor Context:</strong> No data on alternative accommodations (hotels, VRBO)</li>
+</ol>
+<h2>Decision Log Reference</h2>
+<p>All major decisions in the project are documented in <code>reports/decision_log.md</code> with:
+- Options considered
+- Chosen approach
+- Trade-offs accepted
+- Rationale for selection</p>
+<h3>Database Selection</h3>
+<ul>
+<li><strong>Decision:</strong> Switched from DuckDB to SQLite</li>
+<li><strong>Rationale:</strong> </li>
+<li>SQLite has better compatibility across systems</li>
+<li>No need for pre-existing database files</li>
+<li>Built into Python standard library</li>
+<li>Simpler for the assessment environment</li>
+<li><strong>Trade-offs:</strong> </li>
+<li>SQLite has less analytical functionality than DuckDB</li>
+<li>Some advanced window functions not available</li>
+<li>But still sufficient for all required queries</li>
+</ul></body>
+    </html>
+    

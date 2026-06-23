@@ -1,0 +1,349 @@
+
+    <!DOCTYPE html>
+    <html>
+    <head><meta charset="UTF-8">
+    <style>
+        body { font-family: Times New Roman; margin: 1in; line-height: 1.6; }
+        h1 { color: #FF5A5F; border-bottom: 2px solid #FF5A5F; }
+        table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+        th, td { border: 1px solid #ddd; padding: 8px; }
+        th { background-color: #FF5A5F; color: white; }
+    </style>
+    </head>
+    <body><h1>AI Usage Disclosure</h1>
+<h2>AI Usage Philosophy</h2>
+<p>AI tools were used as development assistants rather than decision makers throughout this project. While AI assisted with code generation, debugging, documentation, and analytical approaches, all technical decisions, validation procedures, business interpretations, and final conclusions were made by the author.</p>
+<p>All AI-generated outputs were critically reviewed, tested, and modified where necessary before inclusion in the final submission. AI suggestions were treated as recommendations rather than authoritative answers, and their suitability was evaluated against project requirements, data characteristics, and business objectives.</p>
+<p>The final deliverables represent human-led work supported by AI-assisted productivity and problem-solving tools.</p>
+<hr />
+<h2>1. AI Tools Used</h2>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Version</th>
+<th>Purpose</th>
+<th>Usage Frequency</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>DeepSeek</strong></td>
+<td>Latest</td>
+<td>Code structure, debugging, report template</td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>Claude</strong></td>
+<td>Claude 3.5 Sonnet</td>
+<td>Pipeline design, statistical explanation</td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>GitHub Copilot</strong></td>
+<td>Latest</td>
+<td>Code completion, function generation</td>
+<td>Medium</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>2. AI-Assisted Sections</h2>
+<h3>Data Engineering</h3>
+<ul>
+<li>Assisted with ingestion pipeline structure</li>
+<li>Suggested error handling approaches</li>
+<li>Helped debug SQLite loading issues</li>
+<li>Assisted in schema design</li>
+</ul>
+<h3>Data Analysis</h3>
+<ul>
+<li>Suggested EDA approaches</li>
+<li>Assisted with statistical test implementation</li>
+<li>Helped interpret cross-city comparisons</li>
+</ul>
+<h3>Reporting</h3>
+<ul>
+<li>Assisted with report organization</li>
+<li>Suggested wording for business insights</li>
+<li>Helped improve documentation clarity</li>
+</ul>
+<hr />
+<h2>3. Key Prompts Used</h2>
+<h3>Data Engineering Prompts</h3>
+<ol>
+<li>
+<p><em>"Design error handling and logging for reusable Airbnb data ingestion pipeline"</em></p>
+<p><strong>Response</strong>: Provided structure with LocalDataLoader class</p>
+<p><strong>Modification</strong>: Added Windows compatibility (encoding fixes)</p>
+</li>
+<li>
+<p><em>"Implement star schema for Airbnb data with SQLite"</em></p>
+<p><strong>Response</strong>: Generated dimension and fact table creation</p>
+<p><strong>Modification</strong>: Added dynamic column detection</p>
+</li>
+</ol>
+<h3>Statistical Prompts</h3>
+<ol>
+<li>
+<p><em>"Implement hypothesis tests H1-H5 with effect sizes and business interpretations"</em></p>
+<p><strong>Response</strong>: Provided scipy implementations</p>
+<p><strong>Modification</strong>: Added Levene's test for variance checking</p>
+</li>
+<li>
+<p><em>"Create correlation analysis with VIF for multicollinearity"</em></p>
+<p><strong>Response</strong>: Generated correlation matrix code</p>
+<p><strong>Modification</strong>: Added business interpretation</p>
+</li>
+</ol>
+<h3>ML Prompts</h3>
+<ol>
+<li>
+<p><em>"Implement XGBoost price prediction with feature importance"</em></p>
+<p><strong>Response</strong>: Provided model training code</p>
+<p><strong>Modification</strong>: Added SHAP for explainability</p>
+</li>
+</ol>
+<h3>NLP Prompts</h3>
+<ol>
+<li>
+<p><em>"Create sentiment analysis and topic modeling for Airbnb reviews"</em></p>
+<p><strong>Response</strong>: Provided VADER and NMF implementation</p>
+<p><strong>Modification</strong>: Added RAG system</p>
+</li>
+</ol>
+<h3>Dashboard Prompts</h3>
+<ol>
+<li>
+<p><em>"Create Streamlit dashboard for cross-city Airbnb comparison"</em></p>
+<p><strong>Response</strong>: Provided dashboard structure</p>
+<p><strong>Modification</strong>: Added radar chart for comparison</p>
+</li>
+</ol>
+<h3>Report Prompts</h3>
+<ol>
+<li>
+<p><em>"Write business interpretations for EDA findings"</em></p>
+<p><strong>Response</strong>: Provided initial drafts</p>
+<p><strong>Modification</strong>: Customized for three-city analysis</p>
+</li>
+</ol>
+<hr />
+<h2>4. Output Validation</h2>
+<h3>Code Validation</h3>
+<ul>
+<li><strong>All AI-generated code</strong>: Reviewed line-by-line</li>
+<li><strong>Error handling</strong>: Verified for edge cases</li>
+<li><strong>Data types</strong>: Validated for SQLite compatibility</li>
+<li><strong>Performance</strong>: Tested with sample datasets</li>
+</ul>
+<h3>Statistical Validation</h3>
+<ul>
+<li><strong>Manual Cross-Check</strong>: Key calculations verified with alternative methods</li>
+<li><strong>Assumption Checks</strong>: Normality, variance, independence verified</li>
+<li><strong>Effect Sizes</strong>: Compared with literature benchmarks</li>
+</ul>
+<h3>Model Validation</h3>
+<ul>
+<li><strong>Cross-Validation</strong>: 5-fold CV to prevent overfitting</li>
+<li><strong>Residual Analysis</strong>: Checked for patterns</li>
+<li><strong>Feature Importance</strong>: Validated against domain knowledge</li>
+</ul>
+<h3>Business Validation</h3>
+<ul>
+<li><strong>Interpretations</strong>: Verified against known market patterns</li>
+<li><strong>Recommendations</strong>: Assessed for feasibility</li>
+<li><strong>Insights</strong>: Cross-referenced with multiple sources</li>
+</ul>
+<hr />
+<h2>5. Modifications Made</h2>
+<h3>Code Modifications</h3>
+<table>
+<thead>
+<tr>
+<th>AI Output</th>
+<th>Modification</th>
+<th>Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DuckDB implementation</td>
+<td>Converted to SQLite</td>
+<td>Windows compatibility</td>
+</tr>
+<tr>
+<td>Standard emojis</td>
+<td>Removed from logging</td>
+<td>Console encoding issues</td>
+</tr>
+<tr>
+<td>Hardcoded paths</td>
+<td>Converted to config</td>
+<td>Reusability</td>
+</tr>
+<tr>
+<td>Price tier logic</td>
+<td>Customized function</td>
+<td>Null handling</td>
+</tr>
+</tbody>
+</table>
+<h3>Analysis Modifications</h3>
+<table>
+<thead>
+<tr>
+<th>AI Output</th>
+<th>Modification</th>
+<th>Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Generic interpretations</td>
+<td>Customized for 3 cities</td>
+<td>Business context</td>
+</tr>
+<tr>
+<td>Standard visualizations</td>
+<td>Enhanced for accessibility</td>
+<td>Clarity</td>
+</tr>
+<tr>
+<td>One-size-fits-all</td>
+<td>City-specific breakdowns</td>
+<td>Comparative analysis</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>6. Critical Assessment</h2>
+<h3>Rejected AI Suggestions</h3>
+<ol>
+<li>
+<p><strong>Neural Network Architecture</strong>
+      <strong>Suggestion</strong>: Use deep learning for price prediction</p>
+<p><strong>Rejection Reason</strong>: Overkill for this dataset, XGBoost performed well</p>
+<p><strong>Decision</strong>: Stick with XGBoost</p>
+</li>
+<li>
+<p><strong>Cloud Deployment</strong>
+      <strong>Suggestion</strong>: Deploy to AWS/GCP</p>
+<p><strong>Rejection Reason</strong>: Assessment focus on analysis, not deployment</p>
+<p><strong>Decision</strong>: Document architecture instead</p>
+</li>
+<li>
+<p><strong>Complex Feature Engineering</strong>
+      <strong>Suggestion</strong>: Create 30+ interaction features</p>
+<p><strong>Rejection Reason</strong>: Risk of overfitting</p>
+<p><strong>Decision</strong>: Keep to 15 well-chosen features</p>
+</li>
+</ol>
+<h3>Substantially Modified AI Suggestions</h3>
+<ol>
+<li>
+<p><strong>Price Tier Assignment</strong>
+      <strong>Original</strong>: Used <code>pd.cut()</code> with bins</p>
+<p><strong>Modified</strong>: Custom function with null handling</p>
+<p><strong>Reason</strong>: Avoided <code>NoneType</code> comparison errors</p>
+</li>
+<li>
+<p><strong>Sentiment Analysis</strong>
+      <strong>Original</strong>: Only used VADER</p>
+<p><strong>Modified</strong>: Added correlation with ratings</p>
+<p><strong>Reason</strong>: Business value of sentiment-rating relationship</p>
+</li>
+</ol>
+<hr />
+<h2>7. Lessons Learned</h2>
+<h3>Effective AI Collaboration</h3>
+<ol>
+<li><strong>Specific Prompts</strong>: More specific prompts yield better outputs</li>
+<li><strong>Iterative Refinement</strong>: Multiple iterations improve quality</li>
+<li><strong>Validation is Essential</strong>: Always verify AI outputs</li>
+<li><strong>Context Matters</strong>: Provide business context in prompts</li>
+<li><strong>Document Everything</strong>: Track what was AI-assisted</li>
+</ol>
+<h3>AI Limitations</h3>
+<ol>
+<li><strong>Context Window</strong>: Cannot process full dataset at once</li>
+<li><strong>Business Nuance</strong>: Requires human interpretation</li>
+<li><strong>Edge Cases</strong>: Often missed in initial implementation</li>
+<li><strong>Current Events</strong>: May not know latest data</li>
+<li><strong>Customization</strong>: Always needs adaptation</li>
+</ol>
+<hr />
+<h2>8. Ethical Considerations</h2>
+<h3>Responsible AI Use</h3>
+<ol>
+<li><strong>Disclosure</strong>: Full transparency about AI usage</li>
+<li><strong>Validation</strong>: All outputs verified</li>
+<li><strong>Ownership</strong>: Intellectual ownership maintained</li>
+<li><strong>Originality</strong>: AI used for acceleration, not replacement</li>
+<li><strong>Attribution</strong>: Not claiming AI work as original</li>
+</ol>
+<h3>Data Privacy</h3>
+<ol>
+<li><strong>No Personal Data</strong>: All data is public Airbnb data</li>
+<li><strong>No API Keys</strong>: Not exposed in code</li>
+<li><strong>Local Processing</strong>: All computation local</li>
+<li><strong>GDPR Compliance</strong>: Anonymized data only</li>
+</ol>
+<hr />
+<h2>9. AI Contribution Summary</h2>
+<table>
+<thead>
+<tr>
+<th>Area</th>
+<th>AI Contribution</th>
+<th>Human Contribution</th>
+<th>Balance</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Code Development</td>
+<td>40%</td>
+<td>60%</td>
+<td>Human-led</td>
+</tr>
+<tr>
+<td>Analysis</td>
+<td>30%</td>
+<td>70%</td>
+<td>Human-led</td>
+</tr>
+<tr>
+<td>Interpretation</td>
+<td>20%</td>
+<td>80%</td>
+<td>Human-led</td>
+</tr>
+<tr>
+<td>Report Writing</td>
+<td>30%</td>
+<td>70%</td>
+<td>Human-led</td>
+</tr>
+<tr>
+<td><strong>Overall</strong></td>
+<td><strong>30%</strong></td>
+<td><strong>70%</strong></td>
+<td><strong>Human-led</strong></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>10. Conclusion</h2>
+<p>AI tools were used responsibly as acceleration and assistance tools throughout this assessment. All AI-generated outputs were critically evaluated, validated, and modified as needed. The final submission represents human-led work with AI assistance, maintaining intellectual ownership and professional integrity.</p>
+<p><strong>Key Principles Followed:</strong></p>
+<ul>
+<li>✅ Full disclosure</li>
+<li>✅ Critical evaluation</li>
+<li>✅ Output validation</li>
+<li>✅ Human leadership</li>
+<li>✅ Business context</li>
+</ul>
+<hr /></body>
+    </html>
+    

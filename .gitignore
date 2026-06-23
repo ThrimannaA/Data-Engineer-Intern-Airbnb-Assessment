@@ -1,0 +1,85 @@
+# ============================================
+# PYTHON CACHE FILES
+# ============================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# ============================================
+# VIRTUAL ENVIRONMENT
+# ============================================
+venv/
+env/
+ENV/
+.venv
+
+# ============================================
+# VS CODE SETTINGS (Hide editor config only)
+# ============================================
+.vscode/
+*.code-workspace
+
+# ============================================
+# DATA FILES (Large files)
+# ============================================
+# Raw data (keep the code that loads it, but not the data itself)
+data/raw/
+!data/raw/.gitkeep
+
+# Processed data files (large)
+# Raw data
+data/raw/
+
+# Processed data
+data/processed/
+
+# Keep quality reports
+!data/processed/**/quality_report.json
+!data/processed/pipeline_metadata.json
+
+# ============================================
+# LOGS & TEMPORARY FILES
+# ============================================
+*.log
+*.tmp
+*.temp
+pipeline.log
+
+# ============================================
+# JUPYTER NOTEBOOK CHECKPOINTS
+# ============================================
+.ipynb_checkpoints/
+
+# ============================================
+# OS FILES
+# ============================================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ============================================
+# ENVIRONMENT VARIABLES
+# ============================================
+.env
+
+# ============================================
+# MACHINE LEARNING MODELS (Large files)
+# ============================================
+*.pkl
+*.pickle
+*.model
+models/
+
+# ============================================
+# COMPRESSED FILES (Keep source files only)
+# ============================================
+*.zip
+*.tar.gz
+*.rar
+
+# ============================================
+# TEMPORARY NOTEBOOK OUTPUTS
+# ============================================
+*.nbconvert.ipynb

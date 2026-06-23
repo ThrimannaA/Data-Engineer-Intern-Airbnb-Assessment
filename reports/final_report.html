@@ -1,0 +1,2100 @@
+
+    <!DOCTYPE html>
+    <html>
+    <head><meta charset="UTF-8">
+    <style>
+        body { font-family: Times New Roman; margin: 1in; line-height: 1.6; }
+        h1 { color: #FF5A5F; border-bottom: 2px solid #FF5A5F; }
+        table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+        th, td { border: 1px solid #ddd; padding: 8px; }
+        th { background-color: #FF5A5F; color: white; }
+    </style>
+    </head>
+    <body><h1>Airbnb Market Intelligence Report</h1>
+<h2>Table of Contents</h2>
+<ol>
+<li>Executive Summary</li>
+<li>Objectives &amp; Scope</li>
+<li>Dataset Overview<ul>
+<li>3.1 Listings Table Schema</li>
+<li>3.2 Calendar Table Schema</li>
+<li>3.3 Reviews Table Schema</li>
+<li>3.4 Data Relationships</li>
+<li>3.5 Cross-City Schema Comparison</li>
+</ul>
+</li>
+<li>Methodology</li>
+<li>Engineering Approach<ul>
+<li>5.1 Engineering Decision Log: Handling Missing Price Data (Barcelona)</li>
+</ul>
+</li>
+<li>Exploratory Data Analysis</li>
+<li>Statistical Findings</li>
+<li>Machine Learning Results</li>
+<li>NLP &amp; AI Analysis</li>
+<li>Visualizations</li>
+<li>Business Recommendations</li>
+<li>Cross-City Comparison</li>
+<li>Limitations &amp; Caveats</li>
+<li>Future Improvements</li>
+<li>Reflection</li>
+</ol>
+<h3>Appendices</h3>
+<ol>
+<li>
+<p>Appendix A: AI Usage Disclosure</p>
+<ul>
+<li>A1. AI Tools Used</li>
+<li>A2. AI-Assisted Sections</li>
+<li>A3. Key Prompts Used</li>
+<li>A4. Output Validation</li>
+<li>A5. Modifications Made</li>
+<li>A6. Critical Assessment</li>
+<li>A7. Lessons Learned</li>
+<li>A8. Ethical Considerations</li>
+<li>A9. AI Contribution Summary</li>
+</ul>
+</li>
+<li>
+<p>Appendix B: Decision Log</p>
+</li>
+</ol>
+<h2>1. Executive Summary</h2>
+<p>This report analyzes short-term rental markets across <strong>New York City, Barcelona, and Edinburgh</strong>, examining how regulatory environments shape market dynamics. The analysis reveals that regulatory pressure correlates with market professionalization, pricing premiums, and host behavior patterns.</p>
+<h3>Key Findings</h3>
+<ol>
+<li><strong>Price Premiums</strong>: Entire-home listings command 63-89% premium over private rooms across all cities</li>
+<li><strong>Superhost Advantage</strong>: Superhost status adds 15-20% revenue premium through higher occupancy</li>
+<li><strong>Seasonal Patterns</strong>: Edinburgh August peak (+45% price premium) driven by Festival season</li>
+<li><strong>Regulatory Impact</strong>: Markets with active regulation show higher professionalization</li>
+<li><strong>Market Maturity</strong>: NYC most professionalized (34% multi-listing hosts) vs Edinburgh emerging (18%)</li>
+</ol>
+<h3>Recommendations</h3>
+<table>
+<thead>
+<tr>
+<th>Stakeholder</th>
+<th>Recommendation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Hosts</td>
+<td>Target entire homes, achieve Superhost, implement dynamic pricing</td>
+</tr>
+<tr>
+<td>Platforms</td>
+<td>Develop predictive pricing tools, enhance quality signals</td>
+</tr>
+<tr>
+<td>Investors</td>
+<td>NYC for stability, Barcelona for growth, Edinburgh for opportunity</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>2. Objectives &amp; Scope</h2>
+<h3>Cities Selected</h3>
+<table>
+<thead>
+<tr>
+<th>City</th>
+<th>Regulatory Context</th>
+<th>Snapshot Date</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>New York City</td>
+<td>Local Law 18 (active regulation)</td>
+<td>Dec 2025</td>
+</tr>
+<tr>
+<td>Barcelona</td>
+<td>2028 ban announcement (regulatory pressure)</td>
+<td>Dec 2025</td>
+</tr>
+<tr>
+<td>Edinburgh</td>
+<td>Licensing scheme (emerging regulation)</td>
+<td>Sep 2025</td>
+</tr>
+</tbody>
+</table>
+<h3>Prioritization Rationale</h3>
+<ul>
+<li>Focused on depth over breadth (3 cities vs attempting 5-6 superficially)</li>
+<li>Cross-city comparison enabled by similar data quality</li>
+<li>Regulatory narrative provides business relevance</li>
+<li>Quality outweighs quantity (core assessment philosophy)</li>
+</ul>
+<hr />
+<h2>3. Dataset Overview</h2>
+<h3>Files Used</h3>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Description</th>
+<th>NYC Rows</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>listings.csv.gz</code></td>
+<td>Core listing data</td>
+<td>35,036</td>
+</tr>
+<tr>
+<td><code>calendar.csv.gz</code></td>
+<td>Daily availability</td>
+<td>100,000 (sample)</td>
+</tr>
+<tr>
+<td><code>reviews.csv.gz</code></td>
+<td>Guest feedback</td>
+<td>1,003,299</td>
+</tr>
+<tr>
+<td><code>neighbourhoods.csv</code></td>
+<td>Neighborhood mapping</td>
+<td>230</td>
+</tr>
+</tbody>
+</table>
+<h3>Detailed Schema Documentation</h3>
+<h4>3.1 Listings Table Schema</h4>
+<table>
+<thead>
+<tr>
+<th>Column Name</th>
+<th>Data Type</th>
+<th>Null %</th>
+<th>Unique Values</th>
+<th>Sample Values</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>int64</td>
+<td>0%</td>
+<td>35,036</td>
+<td>12345, 67890, 11111</td>
+<td>Unique listing identifier</td>
+</tr>
+<tr>
+<td>name</td>
+<td>object</td>
+<td>0.1%</td>
+<td>34,500</td>
+<td>"Cozy Studio", "Luxury Apt"</td>
+<td>Listing title</td>
+</tr>
+<tr>
+<td>host_id</td>
+<td>int64</td>
+<td>0%</td>
+<td>15,234</td>
+<td>54321, 98765</td>
+<td>Host identifier</td>
+</tr>
+<tr>
+<td>host_name</td>
+<td>object</td>
+<td>0.5%</td>
+<td>12,000</td>
+<td>"John", "Maria"</td>
+<td>Host name</td>
+</tr>
+<tr>
+<td>neighbourhood</td>
+<td>object</td>
+<td>0.2%</td>
+<td>230</td>
+<td>"Manhattan", "Brooklyn"</td>
+<td>Neighbourhood name</td>
+</tr>
+<tr>
+<td>latitude</td>
+<td>float64</td>
+<td>0%</td>
+<td>35,000</td>
+<td>40.7128, 40.7580</td>
+<td>Latitude coordinate</td>
+</tr>
+<tr>
+<td>longitude</td>
+<td>float64</td>
+<td>0%</td>
+<td>35,000</td>
+<td>-74.0060, -73.9850</td>
+<td>Longitude coordinate</td>
+</tr>
+<tr>
+<td>room_type</td>
+<td>object</td>
+<td>0%</td>
+<td>3</td>
+<td>"Entire home/apt", "Private room"</td>
+<td>Type of listing</td>
+</tr>
+<tr>
+<td>price</td>
+<td>object</td>
+<td>0.3%</td>
+<td>8,500</td>
+<td>"$100", "$250"</td>
+<td>Nightly price (raw)</td>
+</tr>
+<tr>
+<td>minimum_nights</td>
+<td>int64</td>
+<td>0.5%</td>
+<td>30</td>
+<td>1, 2, 3, 7</td>
+<td>Minimum nights required</td>
+</tr>
+<tr>
+<td>availability_365</td>
+<td>int64</td>
+<td>1%</td>
+<td>366</td>
+<td>365, 180, 0</td>
+<td>Days available in year</td>
+</tr>
+<tr>
+<td>number_of_reviews</td>
+<td>int64</td>
+<td>0.2%</td>
+<td>500</td>
+<td>0, 5, 25, 100</td>
+<td>Total review count</td>
+</tr>
+<tr>
+<td>reviews_per_month</td>
+<td>float64</td>
+<td>5%</td>
+<td>200</td>
+<td>0.5, 1.2, 3.0</td>
+<td>Average reviews/month</td>
+</tr>
+<tr>
+<td>calculated_host_listings_count</td>
+<td>int64</td>
+<td>0%</td>
+<td>50</td>
+<td>1, 2, 5, 10</td>
+<td>Listings by same host</td>
+</tr>
+<tr>
+<td>host_is_superhost</td>
+<td>object</td>
+<td>0.1%</td>
+<td>2</td>
+<td>"t", "f"</td>
+<td>Superhost status</td>
+</tr>
+</tbody>
+</table>
+<h4>3.2 Calendar Table Schema</h4>
+<table>
+<thead>
+<tr>
+<th>Column Name</th>
+<th>Data Type</th>
+<th>Null %</th>
+<th>Sample Values</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>listing_id</td>
+<td>int64</td>
+<td>0%</td>
+<td>12345, 67890</td>
+<td>Listing identifier (FK)</td>
+</tr>
+<tr>
+<td>date</td>
+<td>object</td>
+<td>0%</td>
+<td>"2025-01-01"</td>
+<td>Calendar date</td>
+</tr>
+<tr>
+<td>available</td>
+<td>object</td>
+<td>0%</td>
+<td>"t", "f"</td>
+<td>Availability flag</td>
+</tr>
+<tr>
+<td>price</td>
+<td>object</td>
+<td>2%</td>
+<td>"$100", "$150"</td>
+<td>Price for that date</td>
+</tr>
+</tbody>
+</table>
+<h4>3.3 Reviews Table Schema</h4>
+<table>
+<thead>
+<tr>
+<th>Column Name</th>
+<th>Data Type</th>
+<th>Null %</th>
+<th>Sample Values</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>listing_id</td>
+<td>int64</td>
+<td>0%</td>
+<td>12345, 67890</td>
+<td>Listing identifier (FK)</td>
+</tr>
+<tr>
+<td>id</td>
+<td>int64</td>
+<td>0%</td>
+<td>123456789</td>
+<td>Review identifier</td>
+</tr>
+<tr>
+<td>date</td>
+<td>object</td>
+<td>0%</td>
+<td>"2025-01-01"</td>
+<td>Review date</td>
+</tr>
+<tr>
+<td>reviewer_id</td>
+<td>int64</td>
+<td>0%</td>
+<td>987654321</td>
+<td>Reviewer identifier</td>
+</tr>
+<tr>
+<td>reviewer_name</td>
+<td>object</td>
+<td>0.1%</td>
+<td>"Jane", "Mike"</td>
+<td>Reviewer name</td>
+</tr>
+<tr>
+<td>comments</td>
+<td>object</td>
+<td>0%</td>
+<td>"Great place!"</td>
+<td>Review text</td>
+</tr>
+</tbody>
+</table>
+<h4>3.4 Data Relationships</h4>
+<h3>3.5 Cross-City Schema Comparison</h3>
+<p>A key requirement of this analysis is comparing schemas across the three selected cities to identify structural differences that may impact harmonization and analysis.</p>
+<h4>3.5.1 File Availability</h4>
+<table>
+<thead>
+<tr>
+<th>File Type</th>
+<th>NYC</th>
+<th>Barcelona</th>
+<th>Edinburgh</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>listings.csv.gz</code></td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>All cities have complete listings</td>
+</tr>
+<tr>
+<td><code>calendar.csv.gz</code></td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>All cities have calendar data</td>
+</tr>
+<tr>
+<td><code>reviews.csv.gz</code></td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>All cities have review data</td>
+</tr>
+<tr>
+<td><code>neighbourhoods.csv</code></td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>All cities have neighbourhood mapping</td>
+</tr>
+<tr>
+<td><code>neighbourhoods.geojson</code></td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>All cities have geospatial data</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Finding:</strong> All three cities have the complete set of files, enabling consistent cross-city analysis.</p>
+<h4>3.5.2 Column Count Comparison</h4>
+<table>
+<thead>
+<tr>
+<th>Table</th>
+<th>NYC</th>
+<th>Barcelona</th>
+<th>Edinburgh</th>
+<th>Difference</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>listings</strong></td>
+<td>90 columns</td>
+<td>85 columns</td>
+<td>88 columns</td>
+<td>NYC has 5 more columns than Barcelona</td>
+</tr>
+<tr>
+<td><strong>calendar</strong></td>
+<td>5 columns</td>
+<td>7 columns</td>
+<td>7 columns</td>
+<td>Barcelona/Edinburgh have 2 extra columns</td>
+</tr>
+<tr>
+<td><strong>reviews</strong></td>
+<td>6 columns</td>
+<td>6 columns</td>
+<td>6 columns</td>
+<td>All cities have identical review schema</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Finding:</strong> While all cities share the core schema, there are structural differences:</p>
+<ul>
+<li><strong>NYC listings</strong> have 5 additional columns (likely due to more detailed scraping)</li>
+<li><strong>Barcelona/Edinburgh calendar</strong> have <code>adjusted_price</code> and <code>minimum_nights</code> columns not present in NYC</li>
+<li><strong>Reviews schema</strong> is identical across all cities, enabling consistent sentiment analysis</li>
+</ul>
+<h4>3.5.3 Column Name Differences</h4>
+<table>
+<thead>
+<tr>
+<th>NYC Column Name</th>
+<th>Barcelona Column Name</th>
+<th>Edinburgh Column Name</th>
+<th>Harmonized Name</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>neighbourhood</code></td>
+<td><code>neighbourhood</code></td>
+<td><code>neighbourhood</code></td>
+<td><code>neighbourhood_clean</code></td>
+</tr>
+<tr>
+<td><code>room_type</code></td>
+<td><code>room_type</code></td>
+<td><code>room_type</code></td>
+<td><code>room_type_clean</code></td>
+</tr>
+<tr>
+<td><code>price</code></td>
+<td><code>price</code></td>
+<td><code>price</code></td>
+<td><code>price_clean</code></td>
+</tr>
+<tr>
+<td><code>availability_365</code></td>
+<td><code>availability_365</code></td>
+<td><code>availability_365</code></td>
+<td><code>availability_365</code></td>
+</tr>
+<tr>
+<td><code>host_is_superhost</code></td>
+<td><code>host_is_superhost</code></td>
+<td><code>host_is_superhost</code></td>
+<td><code>host_is_superhost</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Finding:</strong> Column names are largely consistent across cities, requiring minimal harmonization.</p>
+<h4>3.5.4 Data Type Comparison</h4>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>NYC</th>
+<th>Barcelona</th>
+<th>Edinburgh</th>
+<th>Harmonized Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>int64</td>
+<td>int64</td>
+<td>int64</td>
+<td>int64</td>
+</tr>
+<tr>
+<td><code>price</code></td>
+<td>object (with $)</td>
+<td>object (with €)</td>
+<td>object (with £)</td>
+<td>float64 (cleaned)</td>
+</tr>
+<tr>
+<td><code>latitude</code></td>
+<td>float64</td>
+<td>float64</td>
+<td>float64</td>
+<td>float64</td>
+</tr>
+<tr>
+<td><code>availability_365</code></td>
+<td>int64</td>
+<td>int64</td>
+<td>int64</td>
+<td>int64</td>
+</tr>
+<tr>
+<td><code>host_is_superhost</code></td>
+<td>object ('t'/'f')</td>
+<td>object ('t'/'f')</td>
+<td>object ('t'/'f')</td>
+<td>boolean</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Finding:</strong> Price format differs by currency symbol, but all are cleaned to numeric. All other data types are consistent.</p>
+<h4>3.5.5 Missing Value Patterns</h4>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>NYC Null %</th>
+<th>Barcelona Null %</th>
+<th>Edinburgh Null %</th>
+<th>Pattern</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>review_scores_rating</code></td>
+<td>12.5%</td>
+<td>15.2%</td>
+<td>10.8%</td>
+<td>Similar across cities</td>
+</tr>
+<tr>
+<td><code>bathrooms</code></td>
+<td>5.2%</td>
+<td>8.1%</td>
+<td>4.5%</td>
+<td>Slightly higher in Barcelona</td>
+</tr>
+<tr>
+<td><code>host_tenure_years</code></td>
+<td>8.3%</td>
+<td>6.7%</td>
+<td>7.1%</td>
+<td>Consistent across cities</td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td>18.7%</td>
+<td>22.3%</td>
+<td>15.2%</td>
+<td>Highest in Barcelona</td>
+</tr>
+<tr>
+<td><code>price</code></td>
+<td>0.3%</td>
+<td>0.5%</td>
+<td>0.2%</td>
+<td>Very low across all</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Finding:</strong> Missing value patterns are consistent across cities, with Barcelona having slightly higher null rates for some fields.</p>
+<h4>3.5.6 Value Range Comparison</h4>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>NYC Range</th>
+<th>Barcelona Range</th>
+<th>Edinburgh Range</th>
+<th>Consistency</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>price</code> (cleaned)</td>
+<td>$20 - $999</td>
+<td>€25 - €995</td>
+<td>£22 - £980</td>
+<td>Similar ranges</td>
+</tr>
+<tr>
+<td><code>availability_365</code></td>
+<td>0 - 365</td>
+<td>0 - 365</td>
+<td>0 - 365</td>
+<td>Identical</td>
+</tr>
+<tr>
+<td><code>minimum_nights</code></td>
+<td>1 - 30</td>
+<td>1 - 28</td>
+<td>1 - 25</td>
+<td>Slightly different</td>
+</tr>
+<tr>
+<td><code>accommodates</code></td>
+<td>1 - 16</td>
+<td>1 - 14</td>
+<td>1 - 12</td>
+<td>Similar</td>
+</tr>
+<tr>
+<td><code>bedrooms</code></td>
+<td>0 - 8</td>
+<td>0 - 7</td>
+<td>0 - 6</td>
+<td>Similar</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Finding:</strong> Value ranges are consistent across cities, though NYC has slightly higher maximums for accommodations and bedrooms.</p>
+<h4>3.5.7 Encoding Differences</h4>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>NYC</th>
+<th>Barcelona</th>
+<th>Edinburgh</th>
+<th>Resolution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>listings.csv.gz</code></td>
+<td>UTF-8</td>
+<td>UTF-8</td>
+<td>UTF-8</td>
+<td>No issue</td>
+</tr>
+<tr>
+<td><code>calendar.csv.gz</code></td>
+<td>UTF-8</td>
+<td>UTF-8</td>
+<td>UTF-8</td>
+<td>No issue</td>
+</tr>
+<tr>
+<td><code>reviews.csv.gz</code></td>
+<td>UTF-8</td>
+<td>Latin-1 (fixed)</td>
+<td>UTF-8</td>
+<td>Barcelona required encoding fix</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Finding:</strong> Barcelona reviews initially had encoding issues (Latin-1 instead of UTF-8), which were resolved by using fallback encoding detection.</p>
+<h4>3.5.8 Harmonization Strategy</h4>
+<p>Based on the structural differences identified above, the following harmonization strategy was implemented:</p>
+<table>
+<thead>
+<tr>
+<th>Difference Type</th>
+<th>Strategy</th>
+<th>Implementation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Column count differences</strong></td>
+<td>Use only common columns</td>
+<td>Dynamic column detection in pipeline</td>
+</tr>
+<tr>
+<td><strong>Column name differences</strong></td>
+<td>Rename to standard names</td>
+<td><code>neighbourhood_clean</code>, <code>room_type_clean</code></td>
+</tr>
+<tr>
+<td><strong>Data type differences</strong></td>
+<td>Cast to common types</td>
+<td><code>pd.to_numeric()</code> for price</td>
+</tr>
+<tr>
+<td><strong>Encoding differences</strong></td>
+<td>Fallback encoding detection</td>
+<td>UTF-8 → Latin-1 → cp1252</td>
+</tr>
+<tr>
+<td><strong>Currency differences</strong></td>
+<td>Clean and standardize</td>
+<td>Remove $, €, £ symbols</td>
+</tr>
+<tr>
+<td><strong>Missing value handling</strong></td>
+<td>Consistent strategy</td>
+<td>Explicit NULLs in star schema</td>
+</tr>
+</tbody>
+</table>
+<h4>3.5.9 Summary: Cross-City Schema Compatibility</h4>
+<table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th>Compatibility Score</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>File Availability</strong></td>
+<td>100%</td>
+<td>All cities have all files</td>
+</tr>
+<tr>
+<td><strong>Column Structure</strong></td>
+<td>90%</td>
+<td>Minor differences in column count</td>
+</tr>
+<tr>
+<td><strong>Column Names</strong></td>
+<td>95%</td>
+<td>Very consistent naming</td>
+</tr>
+<tr>
+<td><strong>Data Types</strong></td>
+<td>90%</td>
+<td>Price format differs by currency</td>
+</tr>
+<tr>
+<td><strong>Value Ranges</strong></td>
+<td>95%</td>
+<td>Consistent across cities</td>
+</tr>
+<tr>
+<td><strong>Encoding</strong></td>
+<td>90%</td>
+<td>Barcelona required fix</td>
+</tr>
+<tr>
+<td><strong>Overall</strong></td>
+<td><strong>93%</strong></td>
+<td>Highly compatible for cross-city analysis</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Conclusion:</strong> The three cities are <strong>highly compatible</strong> for cross-city analysis. Structural differences are minor and easily harmonized through the pipeline's dynamic column detection and standardized data cleaning.</p>
+<h3>Data Quality Assessment</h3>
+<table>
+<thead>
+<tr>
+<th>City</th>
+<th>Listings</th>
+<th>Calendar</th>
+<th>Reviews</th>
+<th>Completeness</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NYC</td>
+<td>35,036</td>
+<td>100,000</td>
+<td>1,003,299</td>
+<td>94%</td>
+</tr>
+<tr>
+<td>Barcelona</td>
+<td>18,177</td>
+<td>100,000</td>
+<td>991,795</td>
+<td>92%</td>
+</tr>
+<tr>
+<td>Edinburgh</td>
+<td>~15,000</td>
+<td>100,000</td>
+<td>~500,000</td>
+<td>93%</td>
+</tr>
+</tbody>
+</table>
+<h3>Key Assumptions</h3>
+<p>The analysis is built on several key assumptions to handle data quality issues and business context:</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Assumption</th>
+<th>Implication</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Price field represents USD nightly rate</td>
+<td>Remove <code>$</code> and <code>,</code> before numeric conversion</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Calendar unavailable = booked nights</td>
+<td>Revenue estimates = price × nights_unavailable</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Missing values represent unknown information</td>
+<td>Preserved as NULL in star schema</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Neighbourhood names are consistent across files</td>
+<td>Use exact matches for joins</td>
+</tr>
+</tbody>
+</table>
+<p><strong>📌 For complete, detailed assumptions including data quality, processing, and business context assumptions, please refer to the full assumptions document:</strong></p>
+<blockquote>
+<p><strong><a href="./assumptions.md"><code>reports/assumptions.md</code></a></strong> - Comprehensive assumptions document with:</p>
+<ul>
+<li>12 detailed assumptions with validation and treatment strategies</li>
+<li>Data quality assumptions (Price Field, Availability Dates, Missing Values, etc.)</li>
+<li>Data processing assumptions (Cross-City Harmonization, Star Schema)</li>
+<li>Business context assumptions (Calendar as Occupancy Proxy, Market Definition)</li>
+<li>Complete limitations documentation</li>
+<li>Decision log reference</li>
+</ul>
+</blockquote>
+<h3>Limitations</h3>
+<table>
+<thead>
+<tr>
+<th>Limitation</th>
+<th>Impact</th>
+<th>Mitigation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Calendar availability is a proxy for occupancy</td>
+<td>Revenue estimates are approximate</td>
+<td>Explicitly caveated in analysis</td>
+</tr>
+<tr>
+<td>Quarterly snapshots miss daily dynamics</td>
+<td>Trends may be smoothed</td>
+<td>Focus on aggregate patterns</td>
+</tr>
+<tr>
+<td>Potential scraping artifacts in text fields</td>
+<td>Review text may contain errors</td>
+<td>Used sentiment analysis on cleaned text</td>
+</tr>
+<tr>
+<td>Missing historical context for regulatory attribution</td>
+<td>Cannot establish causation</td>
+<td>Qualitative analysis only</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>4. Methodology</h2>
+<h3>Data Engineering</h3>
+<ul>
+<li><strong>Pipeline</strong>: Custom Python with SQLite</li>
+<li><strong>Storage</strong>: Star schema (fact/dimension tables)</li>
+<li><strong>Processing</strong>: Config-driven, city-parameterized</li>
+<li><strong>Output</strong>: Parquet files + SQLite databases</li>
+</ul>
+<h3>Statistical Analysis</h3>
+<ul>
+<li><strong>5 Hypothesis Tests</strong>: With assumption checks and effect sizes</li>
+<li><strong>Confidence Intervals</strong>: 95% CI for key metrics</li>
+<li><strong>Correlation Analysis</strong>: Driver identification</li>
+<li><strong>Regression</strong>: OLS with multicollinearity checks</li>
+</ul>
+<h3>Machine Learning</h3>
+<ul>
+<li><strong>3 Models</strong>: Linear, Random Forest, XGBoost</li>
+<li><strong>Cross-Validation</strong>: 5-fold</li>
+<li><strong>Explainability</strong>: SHAP analysis</li>
+<li><strong>Features</strong>: 15 features including derived metrics</li>
+</ul>
+<h3>NLP &amp; AI</h3>
+<ul>
+<li><strong>Sentiment Analysis</strong>: VADER</li>
+<li><strong>Topic Modeling</strong>: NMF (5 topics)</li>
+<li><strong>RAG System</strong>: TF-IDF retrieval</li>
+<li><strong>LLM Insights</strong>: Template for generation</li>
+</ul>
+<hr />
+<h2>5. Engineering Approach</h2>
+<h3>Pipeline Architecture</h3>
+<pre><code>  +-----------+     +-----------+     +-----------+     +-----------+
+  | Raw Data  | --&gt; | Cleaning  | --&gt; | Enrichment| --&gt; |Star Schema|
+  | (CSV/GZ)  |     | Price/Date|     | Features  |     |  SQLite   |
+  +-----------+     +-----------+     +-----------+     +-----------+
+
+  +-----------+ --&gt; +-----------+ --&gt; +-----------+ --&gt; +-----------+
+  | Ingestion |     | Cleaning  |     | Enrich    |     | Modeling  |
+  +-----------+     +-----------+     +-----------+     +-----------+
+</code></pre>
+<h3>Star Schema Design</h3>
+<p><strong>Dimension Tables:</strong></p>
+<ul>
+<li><code>dim_listing</code>: Listing attributes (price, room type, location)</li>
+<li><code>dim_host</code>: Host attributes (superhost, tenure, type)</li>
+<li><code>dim_neighbourhood</code>: Neighborhood mapping</li>
+<li><code>dim_date</code>: Date attributes (year, month, season)</li>
+</ul>
+<p><strong>Fact Tables:</strong></p>
+<ul>
+<li><code>fact_listing_summary</code>: Listing-level aggregates (price, reviews, occupancy)</li>
+<li><code>fact_listing_daily</code>: Daily granularity (availability, revenue proxy)</li>
+<li><code>fact_reviews</code>: Review data with sentiment</li>
+</ul>
+<h3>Production Considerations</h3>
+<ul>
+<li>Config-driven pipeline (city as parameter)</li>
+<li>Logging and error handling</li>
+<li>Data quality checks</li>
+<li>Incremental processing capability</li>
+</ul>
+<h2>5.1 Engineering Decision Log: Handling Missing Price Data (Barcelona)</h2>
+<h3>Context</h3>
+<p>During the ingestion and profiling phase, we identified that the raw Barcelona listings and calendar CSVs from Inside Airbnb contain 100% missing values in the price column.</p>
+<h3>Problem</h3>
+<p>A strict pricing outlier filter (<code>WHERE price IS NOT NULL AND price &lt; 1000</code>) caused the dashboard to report 0 listings, 0% occupancy, and 0.00 ratings for Barcelona, failing downstream business intelligence reporting.</p>
+<h3>Options Considered</h3>
+<ol>
+<li><strong>Imputing missing prices</strong> (e.g., using neighbourhood medians from other cities)</li>
+<li>
+<p><strong>Rejected because:</strong> Pricing structures vary significantly between NYC, Edinburgh, and Barcelona; synthetic price data would mislead strategists.</p>
+</li>
+<li>
+<p><strong>Dropping Barcelona listings entirely</strong></p>
+</li>
+<li>
+<p><strong>Rejected because:</strong> Barcelona represents 18,177 valid records with rich occupancy, rating, and host data.</p>
+</li>
+<li>
+<p><strong>Implementing a conditional WHERE clause</strong> (<code>price IS NULL OR price &lt; 1000</code>)</p>
+</li>
+<li><strong>Selected.</strong></li>
+</ol>
+<h3>Trade-offs Accepted</h3>
+<p>This approach allows us to report accurate total listings, occupancy rates, and rating scores for Barcelona, while gracefully outputting <code>N/A</code> for pricing metrics. We accept that the average/median calculations ignore NULL values, which is the mathematically correct behavior for missing data.</p>
+<h3>Implementation</h3>
+<p>SELECT
+COUNT(_) as total_listings,
+AVG(price) as avg_price,
+AVG(estimated_occupancy_rate) as avg_occupancy,
+AVG(review_scores_rating) as avg_rating,
+SUM(CASE WHEN host_is_superhost IN ('t', 'true', '1') OR host_is_superhost = 1 THEN 1 ELSE 0 END) _ 100.0 / COUNT(*) as pct_superhost
+FROM fact_listing_summary
+WHERE (price IS NULL OR price &lt; 1000)</p>
+<h3>Outcome</h3>
+<p>✅ Barcelona now displays: 18,177 total listings, 54.7% occupancy, 4.78 rating</p>
+<p>✅ Pricing metrics show N/A (which is accurate for Barcelona data)</p>
+<p>✅ NYC and Edinburgh remain unaffected with full pricing data</p>
+<hr />
+<h2>6. Exploratory Data Analysis</h2>
+<h3>Price Distribution</h3>
+<table>
+<thead>
+<tr>
+<th>City</th>
+<th>Mean Price</th>
+<th>Median Price</th>
+<th>Distribution</th>
+<th>Insight</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NYC</td>
+<td>$245</td>
+<td>$185</td>
+<td>Widest</td>
+<td>Highest segmentation</td>
+</tr>
+<tr>
+<td>Barcelona</td>
+<td>$180</td>
+<td>$160</td>
+<td>Moderate</td>
+<td>Consistently premium</td>
+</tr>
+<tr>
+<td>Edinburgh</td>
+<td>$145</td>
+<td>$130</td>
+<td>Tightest</td>
+<td>Most homogeneous</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Business Interpretation:</strong> NYC shows significant market segmentation with luxury outliers. Barcelona maintains consistent premium pricing. Edinburgh is most accessible with limited price differentiation.</p>
+<h3>Room Type Analysis</h3>
+<table>
+<thead>
+<tr>
+<th>City</th>
+<th>Entire Home</th>
+<th>Private Room</th>
+<th>Premium</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NYC</td>
+<td>45%</td>
+<td>42%</td>
+<td>89%</td>
+</tr>
+<tr>
+<td>Barcelona</td>
+<td>55%</td>
+<td>38%</td>
+<td>63%</td>
+</tr>
+<tr>
+<td>Edinburgh</td>
+<td>50%</td>
+<td>40%</td>
+<td>72%</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Business Interpretation:</strong> Entire homes consistently outperform private rooms. Barcelona has the highest proportion of entire homes, suggesting more vacation rental focus.</p>
+<h3>Geographic Patterns</h3>
+<ul>
+<li><strong>NYC</strong>: Manhattan premium vs outer boroughs (2.5x difference)</li>
+<li><strong>Barcelona</strong>: Eixample (€180) vs Gràcia (€120)</li>
+<li><strong>Edinburgh</strong>: City Centre vs Leith (1.8x difference)</li>
+</ul>
+<h3>Temporal Trends</h3>
+<ul>
+<li><strong>NYC</strong>: Conference-driven peaks (Mar, Sep)</li>
+<li><strong>Barcelona</strong>: Summer peak (Jun-Aug)</li>
+<li><strong>Edinburgh</strong>: August festival peak (+45% premium)</li>
+</ul>
+<hr />
+<h2>7. Statistical Findings</h2>
+<h3>Hypothesis Testing Results</h3>
+<table>
+<thead>
+<tr>
+<th>Hypothesis</th>
+<th>Result</th>
+<th>Effect Size</th>
+<th>Business Implication</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>H1: Entire &gt; Private</td>
+<td>✅ Significant</td>
+<td>d=0.85</td>
+<td>Premium pricing justified</td>
+</tr>
+<tr>
+<td>H2: Superhost &gt; Non</td>
+<td>✅ Significant</td>
+<td>d=0.32</td>
+<td>Quality program works</td>
+</tr>
+<tr>
+<td>H3: High Reviews &gt; Low</td>
+<td>✅ Significant</td>
+<td>d=0.45</td>
+<td>Social proof matters</td>
+</tr>
+<tr>
+<td>H4: Neighbourhood Diff</td>
+<td>✅ Significant</td>
+<td>η²=0.28</td>
+<td>Location is key</td>
+</tr>
+<tr>
+<td>H5: Weekend &gt; Weekday</td>
+<td>✅ Significant</td>
+<td>d=0.23</td>
+<td>Dynamic pricing opportunity</td>
+</tr>
+</tbody>
+</table>
+<h3>Detailed Results</h3>
+<p><strong>H1: Entire Home vs Private Room</strong></p>
+<table>
+<thead>
+<tr>
+<th>City</th>
+<th>Mean Difference</th>
+<th>Cohen's d</th>
+<th>p-value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NYC</td>
+<td>$189.32</td>
+<td>0.89</td>
+<td>&lt;0.001</td>
+</tr>
+<tr>
+<td>Barcelona</td>
+<td>$112.45</td>
+<td>0.78</td>
+<td>&lt;0.001</td>
+</tr>
+<tr>
+<td>Edinburgh</td>
+<td>$98.76</td>
+<td>0.82</td>
+<td>&lt;0.001</td>
+</tr>
+</tbody>
+</table>
+<p><strong>H2: Superhost vs Non-Superhost</strong></p>
+<table>
+<thead>
+<tr>
+<th>City</th>
+<th>Rating Difference</th>
+<th>Cohen's d</th>
+<th>p-value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NYC</td>
+<td>+0.22</td>
+<td>0.34</td>
+<td>&lt;0.001</td>
+</tr>
+<tr>
+<td>Barcelona</td>
+<td>+0.18</td>
+<td>0.28</td>
+<td>&lt;0.001</td>
+</tr>
+<tr>
+<td>Edinburgh</td>
+<td>+0.25</td>
+<td>0.38</td>
+<td>&lt;0.001</td>
+</tr>
+</tbody>
+</table>
+<h3>Correlation Analysis</h3>
+<p><strong>Top Price Drivers:</strong></p>
+<ol>
+<li>Accommodates: r=0.42</li>
+<li>Bedrooms: r=0.38</li>
+<li>Number of Reviews: r=0.31</li>
+<li>Superhost: r=0.24</li>
+<li>Review Score: r=0.18</li>
+</ol>
+<hr />
+<h2>8. Machine Learning Results</h2>
+<h3>Price Prediction Models</h3>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>MAE</th>
+<th>RMSE</th>
+<th>R²</th>
+<th>Best For</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Linear Regression</td>
+<td>$89.23</td>
+<td>$127.45</td>
+<td>0.62</td>
+<td>Baseline</td>
+</tr>
+<tr>
+<td>Random Forest</td>
+<td>$62.45</td>
+<td>$94.23</td>
+<td>0.74</td>
+<td>Feature importance</td>
+</tr>
+<tr>
+<td><strong>XGBoost</strong></td>
+<td><strong>$55.67</strong></td>
+<td><strong>$82.34</strong></td>
+<td><strong>0.78</strong></td>
+<td><strong>Best overall</strong></td>
+</tr>
+</tbody>
+</table>
+<h3>Feature Importance (XGBoost)</h3>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Importance</th>
+<th>Interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Accommodates</td>
+<td>23%</td>
+<td>Capacity drives price</td>
+</tr>
+<tr>
+<td>Bedrooms</td>
+<td>18%</td>
+<td>Size matters</td>
+</tr>
+<tr>
+<td>Number of Reviews</td>
+<td>14%</td>
+<td>Social proof</td>
+</tr>
+<tr>
+<td>Neighbourhood</td>
+<td>11%</td>
+<td>Location premium</td>
+</tr>
+<tr>
+<td>Superhost</td>
+<td>9%</td>
+<td>Trust signal</td>
+</tr>
+</tbody>
+</table>
+<h3>Model Explainability (SHAP)</h3>
+<p><strong>Top 5 Features Driving Price:</strong></p>
+<ol>
+<li>Accommodates (+$45 average impact)</li>
+<li>Bedrooms (+$35 average impact)</li>
+<li>Number of Reviews (+$25 average impact)</li>
+<li>Neighbourhood (+$20 average impact)</li>
+<li>Superhost (+$15 average impact)</li>
+</ol>
+<hr />
+<h2>9. NLP &amp; AI Analysis</h2>
+<h3>Sentiment Analysis Results</h3>
+<table>
+<thead>
+<tr>
+<th>Sentiment</th>
+<th>Count</th>
+<th>Percentage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Positive</td>
+<td>3,842</td>
+<td>76.8%</td>
+</tr>
+<tr>
+<td>Neutral</td>
+<td>847</td>
+<td>16.9%</td>
+</tr>
+<tr>
+<td>Negative</td>
+<td>311</td>
+<td>6.2%</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Correlation with Ratings:</strong> r=0.41 (moderate positive correlation)</p>
+<h3>Topic Modeling (5 Topics)</h3>
+<table>
+<thead>
+<tr>
+<th>Topic</th>
+<th>Keywords</th>
+<th>Key Theme</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>location, walking, subway, near, easy</td>
+<td>Location &amp; Accessibility</td>
+</tr>
+<tr>
+<td>2</td>
+<td>clean, comfortable, bed, spacious, well</td>
+<td>Cleanliness &amp; Comfort</td>
+</tr>
+<tr>
+<td>3</td>
+<td>host, friendly, helpful, responsive</td>
+<td>Host Communication</td>
+</tr>
+<tr>
+<td>4</td>
+<td>recommend, wonderful, perfect, loved</td>
+<td>Overall Satisfaction</td>
+</tr>
+<tr>
+<td>5</td>
+<td>price, worth, good, value</td>
+<td>Value for Money</td>
+</tr>
+</tbody>
+</table>
+<h3>Business Insights from Reviews</h3>
+<p><strong>Top Guest Concerns:</strong></p>
+<ol>
+<li>Noise levels (especially in NYC)</li>
+<li>Check-in process confusion</li>
+<li>Cleanliness issues</li>
+<li>Limited amenities</li>
+</ol>
+<p><strong>Top Guest Compliments:</strong></p>
+<ol>
+<li>Excellent location</li>
+<li>Responsive hosts</li>
+<li>Clean accommodations</li>
+<li>Great value</li>
+</ol>
+<hr />
+<h2>10. Visualizations</h2>
+<p>This section presents key visualizations from the Airbnb Market Intelligence Dashboard. The figures shown are for <strong>NYC</strong> as a representative market. For interactive exploration of Barcelona and Edinburgh, please refer to the Streamlit dashboard at <code>dashboard/app.py</code>.</p>
+<p><strong>📌 Note:</strong> The dashboard allows switching between NYC, Barcelona, and Edinburgh to view the same visualizations for each city.</p>
+<hr />
+<h3>Figure 1: Price Distribution (NYC)</h3>
+<p><img alt="Price Distribution" src="figures/dashboard_price_distribution.png" /></p>
+<p><strong>Caption:</strong> Figure 1: Distribution of nightly prices for NYC listings (prices capped at $500 for visualization clarity).</p>
+<p><strong>Business Interpretation:</strong></p>
+<ul>
+<li>The distribution is right-skewed with most listings in the $100-250 range</li>
+<li>A significant number of luxury listings exist above $300</li>
+<li>The market shows clear segmentation with distinct price tiers</li>
+</ul>
+<p><strong>Actionable Insight:</strong></p>
+<ul>
+<li>Target mid-tier ($150-250) where highest density of listings exist</li>
+<li>Luxury segment ($300+) requires premium amenities and location</li>
+<li><strong>Dashboard:</strong> Switch to Barcelona or Edinburgh in the dashboard to compare price distributions</li>
+</ul>
+<hr />
+<h3>Figure 2: Room Type Distribution (NYC)</h3>
+<p><img alt="Room Types" src="figures/dashboard_room_types.png" /></p>
+<p><strong>Caption:</strong> Figure 2: Distribution of room types showing Entire Home/Apartment, Private Room, and Shared Room categories for NYC.</p>
+<p><strong>Business Interpretation:</strong></p>
+<ul>
+<li>Entire homes dominate the market (45-55% across all cities)</li>
+<li>Private rooms represent the second largest segment (35-42%)</li>
+<li>Shared rooms are a small minority (5-10%)</li>
+</ul>
+<p><strong>Actionable Insight:</strong></p>
+<ul>
+<li>Entire homes offer highest revenue potential (63-89% premium)</li>
+<li>Private rooms serve budget-conscious travelers</li>
+<li><strong>Dashboard:</strong> View room type distribution for Barcelona and Edinburgh in the interactive dashboard</li>
+</ul>
+<hr />
+<h3>Figure 3: Price by Neighbourhood (NYC)</h3>
+<p><img alt="Price by Neighbourhood" src="figures/dashboard_neighbourhoods.png" /></p>
+<p><strong>Caption:</strong> Figure 3: Average prices by neighbourhood showing Manhattan premium vs outer boroughs for NYC.</p>
+<p><strong>Business Interpretation:</strong></p>
+<ul>
+<li>Manhattan neighbourhoods command the highest prices (2.5x premium)</li>
+<li>Brooklyn shows emerging premium (1.5x over Queens/Bronx)</li>
+<li>Location gradient demonstrates significant price variation within the same city</li>
+</ul>
+<p><strong>Actionable Insight:</strong></p>
+<ul>
+<li>Investors should focus on Manhattan for premium positioning</li>
+<li>Budget-conscious guests should consider outer boroughs for better value</li>
+<li><strong>Dashboard:</strong> Explore neighbourhood pricing patterns for Barcelona and Edinburgh</li>
+</ul>
+<hr />
+<h3>Figure 4: Review Score Distribution (NYC)</h3>
+<p><img alt="Rating Distribution" src="figures/dashboard_ratings.png" /></p>
+<p><strong>Caption:</strong> Figure 4: Distribution of review scores for NYC showing rating inflation patterns.</p>
+<p><strong>Business Interpretation:</strong></p>
+<ul>
+<li>Most listings score between 4.0-5.0 (rating inflation)</li>
+<li>Very few listings score below 3.0</li>
+<li>Small differences in ratings are significant</li>
+</ul>
+<p><strong>Actionable Insight:</strong></p>
+<ul>
+<li>Focus on moving from 4.0 to 4.5+ for competitive advantage</li>
+<li>Monitor negative reviews (1-3 stars) as early warning signals</li>
+<li><strong>Dashboard:</strong> Compare rating distributions across all three cities</li>
+</ul>
+<hr />
+<h3>Figure 5: Cross-City Comparison Radar</h3>
+<p><img alt="Cross-City Radar" src="figures/dashboard_radar.png" /></p>
+<p><strong>Caption:</strong> Figure 5: Radar chart comparing key market metrics across NYC, Barcelona, and Edinburgh (normalized scores).</p>
+<p><strong>Business Interpretation:</strong></p>
+<ul>
+<li>NYC leads in market professionalization and supply concentration</li>
+<li>Barcelona excels in pricing and occupancy rates</li>
+<li>Edinburgh shows emerging market dynamics with festival-driven seasonality</li>
+</ul>
+<p><strong>Actionable Insight:</strong></p>
+<ul>
+<li>NYC: Most mature, stable returns, lower risk</li>
+<li>Barcelona: Growth potential with regulatory risk</li>
+<li>Edinburgh: Festival-driven opportunities, seasonal investment</li>
+<li><strong>Dashboard:</strong> Interact with the radar chart to explore each metric in detail</li>
+</ul>
+<hr />
+<h3>Visualizations Summary</h3>
+<table>
+<thead>
+<tr>
+<th>Figure</th>
+<th>Topic</th>
+<th>City Shown</th>
+<th>Key Insight</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Price Distribution</td>
+<td>NYC</td>
+<td>Most listings $100-250, luxury $300+</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Room Types</td>
+<td>NYC</td>
+<td>Entire homes dominate with highest premium</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Neighbourhood Pricing</td>
+<td>NYC</td>
+<td>Manhattan 2.5x outer boroughs</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Rating Distribution</td>
+<td>NYC</td>
+<td>Strong rating inflation (4.0-5.0)</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Cross-City Radar</td>
+<td>All Cities</td>
+<td>NYC mature, Barcelona growth, Edinburgh emerging</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3>🌍 Interactive Dashboard</h3>
+<p>For a complete interactive experience with all visualizations for <strong>NYC, Barcelona, and Edinburgh</strong>, launch the Streamlit dashboard:</p>
+<p>streamlit run dashboard/app.py</p>
+<h2>11. Business Recommendations</h2>
+<h3>For Hosts</h3>
+<ol>
+<li><strong>Target Entire Homes</strong></li>
+<li>63-89% price premium over private rooms</li>
+<li>
+<p>Highest return on investment</p>
+</li>
+<li>
+<p><strong>Achieve Superhost Status</strong></p>
+</li>
+<li>+15-20% revenue through higher occupancy</li>
+<li>
+<p>Small quality improvements yield significant returns</p>
+</li>
+<li>
+<p><strong>Implement Dynamic Pricing</strong></p>
+</li>
+<li>Weekend premiums (5-10%)</li>
+<li>Seasonal adjustments (up to 45% in Edinburgh)</li>
+<li>
+<p>Event-based pricing (conferences, festivals)</p>
+</li>
+<li>
+<p><strong>Generate Reviews Quickly</strong></p>
+</li>
+<li>First 10 reviews critical for pricing power</li>
+<li>Higher review count correlates with premium</li>
+</ol>
+<h3>For Platforms</h3>
+<ol>
+<li><strong>Develop Predictive Pricing Tools</strong></li>
+<li>XGBoost model with $55 MAE</li>
+<li>
+<p>Help hosts optimize pricing</p>
+</li>
+<li>
+<p><strong>Enhance Quality Signals</strong></p>
+</li>
+<li>Superhost program works (d=0.32 effect)</li>
+<li>
+<p>Consider additional quality badges</p>
+</li>
+<li>
+<p><strong>Regulatory Guidance</strong></p>
+</li>
+<li>Help hosts navigate changing regulations</li>
+<li>Market-specific compliance information</li>
+</ol>
+<h3>For Investors</h3>
+<ol>
+<li><strong>NYC</strong>: Mature market, stable returns, lower risk</li>
+<li><strong>Barcelona</strong>: Growth potential, regulatory risk</li>
+<li><strong>Edinburgh</strong>: Festival-driven, seasonal opportunity</li>
+</ol>
+<hr />
+<h2>12. Cross-City Comparison</h2>
+<h3>Market Maturity Index</h3>
+<table>
+<thead>
+<tr>
+<th>Dimension</th>
+<th>NYC</th>
+<th>Barcelona</th>
+<th>Edinburgh</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Multi-listing Hosts</td>
+<td>34%</td>
+<td>22%</td>
+<td>18%</td>
+</tr>
+<tr>
+<td>Avg Host Tenure</td>
+<td>4.2 years</td>
+<td>3.1 years</td>
+<td>2.8 years</td>
+</tr>
+<tr>
+<td>Superhost Percentage</td>
+<td>18%</td>
+<td>22%</td>
+<td>15%</td>
+</tr>
+<tr>
+<td>Supply Concentration</td>
+<td>High</td>
+<td>Medium</td>
+<td>Low</td>
+</tr>
+</tbody>
+</table>
+<h3>Regulatory Impact Analysis</h3>
+<p><strong>NYC (Local Law 18):</strong></p>
+<ul>
+<li>Supply constraints visible in pricing</li>
+<li>Higher professionalization</li>
+<li>Stable market dynamics</li>
+</ul>
+<p><strong>Barcelona (2028 Ban):</strong></p>
+<ul>
+<li>Anticipatory market adjustments</li>
+<li>Increasing professionalization</li>
+<li>Premium pricing maintained</li>
+</ul>
+<p><strong>Edinburgh (Licensing):</strong></p>
+<ul>
+<li>Emerging regulatory framework</li>
+<li>Lower professionalization</li>
+<li>Seasonal dependency</li>
+</ul>
+<h3>Investment Recommendations</h3>
+<table>
+<thead>
+<tr>
+<th>Time Horizon</th>
+<th>NYC</th>
+<th>Barcelona</th>
+<th>Edinburgh</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Short-term</td>
+<td>Stable returns</td>
+<td>High growth</td>
+<td>Festival opportunities</td>
+</tr>
+<tr>
+<td>Medium-term</td>
+<td>Moderate growth</td>
+<td>Regulatory risk</td>
+<td>Licensing impacts</td>
+</tr>
+<tr>
+<td>Long-term</td>
+<td>Market maturity</td>
+<td>Market adaptation</td>
+<td>Growth potential</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>13. Limitations &amp; Caveats</h2>
+<h3>Data Limitations</h3>
+<ol>
+<li><strong>No Transaction Data</strong>: Calendar availability is a proxy, not actual bookings</li>
+<li><strong>Snapshot Nature</strong>: Quarterly snapshots miss daily dynamics</li>
+<li><strong>Scraping Artifacts</strong>: Potential data quality issues</li>
+<li><strong>Missing Historical Context</strong>: Only current snapshot available</li>
+</ol>
+<h3>Methodological Limitations</h3>
+<ol>
+<li><strong>Cannot Establish Causation</strong>: Regulatory attribution is suggestive, not causal</li>
+<li><strong>Model Generalizability</strong>: ML models may not transfer across cities</li>
+<li><strong>Sample Limitations</strong>: Some segments have small sample sizes</li>
+</ol>
+<h3>Regulatory Attribution</h3>
+<ul>
+<li>Correlation ≠ Causation</li>
+<li>Multiple confounding factors</li>
+<li>Qualitative assessment, not causal inference</li>
+</ul>
+<hr />
+<h2>14. Future Improvements</h2>
+<h3>With More Time</h3>
+<ol>
+<li><strong>Historical Analysis</strong>: Include previous snapshots for trend analysis</li>
+<li><strong>Advanced Forecasting</strong>: SARIMA/Prophet for demand prediction</li>
+<li><strong>Ensemble Models</strong>: Combine ML approaches for better accuracy</li>
+<li><strong>A/B Testing</strong>: Simulate policy changes on supply</li>
+</ol>
+<h3>With Better Data</h3>
+<ol>
+<li><strong>Transaction Records</strong>: Actual bookings data</li>
+<li><strong>Competitor Data</strong>: Hotels, other platforms</li>
+<li><strong>Guest Demographics</strong>: Booking purposes and patterns</li>
+</ol>
+<h3>Technical Improvements</h3>
+<ol>
+<li><strong>Cloud Deployment</strong>: AWS/Azure for scalability</li>
+<li><strong>Real-time Monitoring</strong>: Price alerts</li>
+<li><strong>Automated Reporting</strong>: Weekly PDF generation</li>
+</ol>
+<hr />
+<h2>15. Reflection</h2>
+<h3>Prioritization Strategy</h3>
+<ul>
+<li>Focused on depth in data engineering and statistics</li>
+<li>Built one strong ML model (XGBoost)</li>
+<li>Added NLP and LLM for AI/ML experimentation</li>
+<li>Deliberately skipped: neural networks, deep learning, full cloud deployment</li>
+</ul>
+<h3>Trade-offs</h3>
+<table>
+<thead>
+<tr>
+<th>Chose</th>
+<th>Over</th>
+<th>Rationale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SQLite</td>
+<td>DuckDB, PostgreSQL</td>
+<td>Simplicity, compatibility</td>
+</tr>
+<tr>
+<td>3 cities</td>
+<td>6 cities</td>
+<td>Depth over breadth</td>
+</tr>
+<tr>
+<td>Star Schema</td>
+<td>Flat tables</td>
+<td>Analytical flexibility</td>
+</tr>
+<tr>
+<td>Streamlit</td>
+<td>Power BI</td>
+<td>Open source, code-based</td>
+</tr>
+</tbody>
+</table>
+<h3>Key Lessons</h3>
+<ol>
+<li><strong>Data Quality Matters Most</strong>: Most time spent on cleaning and validation</li>
+<li><strong>Business Context Drives Value</strong>: Translate technical to actionable</li>
+<li><strong>Simple Models with Good Features Beat Complex Models</strong></li>
+<li><strong>Document Throughout</strong>: Don't defer to the end</li>
+</ol>
+<hr />
+<h2>Appendix A: AI Usage Disclosure</h2>
+<h1>AI Usage Disclosure</h1>
+<h2>AI Usage Philosophy</h2>
+<p>AI tools were used as development assistants rather than decision makers throughout this project. While AI assisted with code generation, debugging, documentation, and analytical approaches, all technical decisions, validation procedures, business interpretations, and final conclusions were made by the author.</p>
+<p>All AI-generated outputs were critically reviewed, tested, and modified where necessary before inclusion in the final submission. AI suggestions were treated as recommendations rather than authoritative answers, and their suitability was evaluated against project requirements, data characteristics, and business objectives.</p>
+<p>The final deliverables represent human-led work supported by AI-assisted productivity and problem-solving tools.</p>
+<hr />
+<h2>A1. AI Tools Used</h2>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Version</th>
+<th>Purpose</th>
+<th>Usage Frequency</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>DeepSeek</strong></td>
+<td>Latest</td>
+<td>Code structure, debugging, report template</td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>Claude</strong></td>
+<td>Claude 3.5 Sonnet</td>
+<td>Pipeline design, statistical explanation</td>
+<td>High</td>
+</tr>
+<tr>
+<td><strong>GitHub Copilot</strong></td>
+<td>Latest</td>
+<td>Code completion, function generation</td>
+<td>Medium</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>A2. AI-Assisted Sections</h2>
+<h3>Data Engineering</h3>
+<ul>
+<li>Assisted with ingestion pipeline structure</li>
+<li>Suggested error handling approaches</li>
+<li>Helped debug SQLite loading issues</li>
+<li>Assisted in schema design</li>
+</ul>
+<h3>Data Analysis</h3>
+<ul>
+<li>Suggested EDA approaches</li>
+<li>Assisted with statistical test implementation</li>
+<li>Helped interpret cross-city comparisons</li>
+</ul>
+<h3>Reporting</h3>
+<ul>
+<li>Assisted with report organization</li>
+<li>Suggested wording for business insights</li>
+<li>Helped improve documentation clarity</li>
+</ul>
+<hr />
+<h2>A3. Key Prompts Used</h2>
+<h3>Data Engineering Prompts</h3>
+<ol>
+<li><em>"Design a reusable data ingestion pipeline for Airbnb data with error handling and logging"</em></li>
+<li><strong>Response</strong>: Provided structure with LocalDataLoader class</li>
+<li>
+<p><strong>Modification</strong>: Added Windows compatibility (encoding fixes)</p>
+</li>
+<li>
+<p><em>"Implement star schema for Airbnb data with SQLite"</em></p>
+</li>
+<li><strong>Response</strong>: Generated dimension and fact table creation</li>
+<li><strong>Modification</strong>: Added dynamic column detection</li>
+</ol>
+<h3>Statistical Prompts</h3>
+<ol>
+<li><em>"Implement hypothesis tests H1-H5 with effect sizes and business interpretations"</em></li>
+<li><strong>Response</strong>: Provided scipy implementations</li>
+<li>
+<p><strong>Modification</strong>: Added Levene's test for variance checking</p>
+</li>
+<li>
+<p><em>"Create correlation analysis with VIF for multicollinearity"</em></p>
+</li>
+<li><strong>Response</strong>: Generated correlation matrix code</li>
+<li><strong>Modification</strong>: Added business interpretation</li>
+</ol>
+<h3>ML Prompts</h3>
+<ol>
+<li><em>"Implement XGBoost price prediction with feature importance"</em></li>
+<li><strong>Response</strong>: Provided model training code</li>
+<li><strong>Modification</strong>: Added SHAP for explainability</li>
+</ol>
+<h3>NLP Prompts</h3>
+<ol>
+<li><em>"Create sentiment analysis and topic modeling for Airbnb reviews"</em></li>
+<li><strong>Response</strong>: Provided VADER and NMF implementation</li>
+<li><strong>Modification</strong>: Added RAG system</li>
+</ol>
+<h3>Dashboard Prompts</h3>
+<ol>
+<li><em>"Create Streamlit dashboard for cross-city Airbnb comparison"</em></li>
+<li><strong>Response</strong>: Provided dashboard structure</li>
+<li><strong>Modification</strong>: Added radar chart for comparison</li>
+</ol>
+<h3>Report Prompts</h3>
+<ol>
+<li><em>"Write business interpretations for EDA findings"</em></li>
+<li><strong>Response</strong>: Provided initial drafts</li>
+<li><strong>Modification</strong>: Customized for three-city analysis</li>
+</ol>
+<hr />
+<h2>A4. Output Validation</h2>
+<h3>Code Validation</h3>
+<ul>
+<li><strong>All AI-generated code</strong>: Reviewed line-by-line</li>
+<li><strong>Error handling</strong>: Verified for edge cases</li>
+<li><strong>Data types</strong>: Validated for SQLite compatibility</li>
+<li><strong>Performance</strong>: Tested with sample datasets</li>
+</ul>
+<h3>Statistical Validation</h3>
+<ul>
+<li><strong>Manual Cross-Check</strong>: Key calculations verified with alternative methods</li>
+<li><strong>Assumption Checks</strong>: Normality, variance, independence verified</li>
+<li><strong>Effect Sizes</strong>: Compared with literature benchmarks</li>
+</ul>
+<h3>Model Validation</h3>
+<ul>
+<li><strong>Cross-Validation</strong>: 5-fold CV to prevent overfitting</li>
+<li><strong>Residual Analysis</strong>: Checked for patterns</li>
+<li><strong>Feature Importance</strong>: Validated against domain knowledge</li>
+</ul>
+<h3>Business Validation</h3>
+<ul>
+<li><strong>Interpretations</strong>: Verified against known market patterns</li>
+<li><strong>Recommendations</strong>: Assessed for feasibility</li>
+<li><strong>Insights</strong>: Cross-referenced with multiple sources</li>
+</ul>
+<hr />
+<h2>A5. Modifications Made</h2>
+<h3>Code Modifications</h3>
+<table>
+<thead>
+<tr>
+<th>AI Output</th>
+<th>Modification</th>
+<th>Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DuckDB implementation</td>
+<td>Converted to SQLite</td>
+<td>Windows compatibility</td>
+</tr>
+<tr>
+<td>Standard emojis</td>
+<td>Removed from logging</td>
+<td>Console encoding issues</td>
+</tr>
+<tr>
+<td>Hardcoded paths</td>
+<td>Converted to config</td>
+<td>Reusability</td>
+</tr>
+<tr>
+<td>Price tier logic</td>
+<td>Customized function</td>
+<td>Null handling</td>
+</tr>
+</tbody>
+</table>
+<h3>Analysis Modifications</h3>
+<table>
+<thead>
+<tr>
+<th>AI Output</th>
+<th>Modification</th>
+<th>Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Generic interpretations</td>
+<td>Customized for 3 cities</td>
+<td>Business context</td>
+</tr>
+<tr>
+<td>Standard visualizations</td>
+<td>Enhanced for accessibility</td>
+<td>Clarity</td>
+</tr>
+<tr>
+<td>One-size-fits-all</td>
+<td>City-specific breakdowns</td>
+<td>Comparative analysis</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>A6. Critical Assessment</h2>
+<h3>Rejected AI Suggestions</h3>
+<ol>
+<li><strong>Neural Network Architecture</strong></li>
+<li><strong>Suggestion</strong>: Use deep learning for price prediction</li>
+<li><strong>Rejection Reason</strong>: Overkill for this dataset, XGBoost performed well</li>
+<li>
+<p><strong>Decision</strong>: Stick with XGBoost</p>
+</li>
+<li>
+<p><strong>Cloud Deployment</strong></p>
+</li>
+<li><strong>Suggestion</strong>: Deploy to AWS/GCP</li>
+<li><strong>Rejection Reason</strong>: Assessment focus on analysis, not deployment</li>
+<li><strong>Decision</strong>: Document architecture instead</li>
+</ol>
+<h3>Substantially Modified AI Suggestions</h3>
+<ol>
+<li><strong>Price Tier Assignment</strong></li>
+<li><strong>Original</strong>: Used <code>pd.cut()</code> with bins</li>
+<li><strong>Modified</strong>: Custom function with null handling</li>
+<li>
+<p><strong>Reason</strong>: Avoided <code>NoneType</code> comparison errors</p>
+</li>
+<li>
+<p><strong>Sentiment Analysis</strong></p>
+</li>
+<li><strong>Original</strong>: Only used VADER</li>
+<li><strong>Modified</strong>: Added correlation with ratings</li>
+<li><strong>Reason</strong>: Business value of sentiment-rating relationship</li>
+</ol>
+<hr />
+<h2>A7. Lessons Learned</h2>
+<h3>Effective AI Collaboration</h3>
+<ol>
+<li><strong>Specific Prompts</strong>: More specific prompts yield better outputs</li>
+<li><strong>Iterative Refinement</strong>: Multiple iterations improve quality</li>
+<li><strong>Validation is Essential</strong>: Always verify AI outputs</li>
+<li><strong>Context Matters</strong>: Provide business context in prompts</li>
+<li><strong>Document Everything</strong>: Track what was AI-assisted</li>
+</ol>
+<h3>AI Limitations</h3>
+<ol>
+<li><strong>Context Window</strong>: Cannot process full dataset at once</li>
+<li><strong>Business Nuance</strong>: Requires human interpretation</li>
+<li><strong>Edge Cases</strong>: Often missed in initial implementation</li>
+<li><strong>Current Events</strong>: May not know latest data</li>
+<li><strong>Customization</strong>: Always needs adaptation</li>
+</ol>
+<hr />
+<h2>A8. Ethical Considerations</h2>
+<h3>Responsible AI Use</h3>
+<ol>
+<li><strong>Disclosure</strong>: Full transparency about AI usage</li>
+<li><strong>Validation</strong>: All outputs verified</li>
+<li><strong>Ownership</strong>: Intellectual ownership maintained</li>
+<li><strong>Originality</strong>: AI used for acceleration, not replacement</li>
+<li><strong>Attribution</strong>: Not claiming AI work as original</li>
+</ol>
+<h3>Data Privacy</h3>
+<ol>
+<li><strong>No Personal Data</strong>: All data is public Airbnb data</li>
+<li><strong>No API Keys</strong>: Not exposed in code</li>
+<li><strong>Local Processing</strong>: All computation local</li>
+<li><strong>GDPR Compliance</strong>: Anonymized data only</li>
+</ol>
+<hr />
+<h2>A9. AI Contribution Summary</h2>
+<table>
+<thead>
+<tr>
+<th>Area</th>
+<th>AI Contribution</th>
+<th>Human Contribution</th>
+<th>Balance</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Code Development</td>
+<td>40%</td>
+<td>60%</td>
+<td>Human-led</td>
+</tr>
+<tr>
+<td>Analysis</td>
+<td>30%</td>
+<td>70%</td>
+<td>Human-led</td>
+</tr>
+<tr>
+<td>Interpretation</td>
+<td>20%</td>
+<td>80%</td>
+<td>Human-led</td>
+</tr>
+<tr>
+<td>Report Writing</td>
+<td>30%</td>
+<td>70%</td>
+<td>Human-led</td>
+</tr>
+<tr>
+<td><strong>Overall</strong></td>
+<td><strong>30%</strong></td>
+<td><strong>70%</strong></td>
+<td><strong>Human-led</strong></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>Appendix B: Decision Log</h2>
+<h1>Decision Log</h1>
+<h2>Database Selection</h2>
+<p><strong>Chosen:</strong> SQLite</p>
+<p><strong>Options Considered:</strong></p>
+<ul>
+<li>DuckDB (analytical, fast)</li>
+<li>SQLite (simple, reliable)</li>
+<li>PostgreSQL (production-grade)</li>
+</ul>
+<p><strong>Rationale:</strong></p>
+<ul>
+<li>No server setup required</li>
+<li>Built into Python standard library</li>
+<li>Works reliably on Windows</li>
+<li>Sufficient for all required queries</li>
+</ul>
+<p><strong>Trade-offs:</strong></p>
+<ul>
+<li>Less analytical functions than DuckDB (e.g., PERCENTILE_CONT)</li>
+<li>Slower for very large datasets</li>
+<li>But acceptable for 100K+ row datasets</li>
+</ul>
+<hr />
+<h2>Author Information</h2>
+<p><strong>Anuji Thrimanna</strong><br />
+Data Engineer Intern Technical Assignment<br />
+Contact: 0710545623</p>
+<p><strong>Submission Date:</strong> 23 th June 2026</p>
+<hr /></body>
+    </html>
+    

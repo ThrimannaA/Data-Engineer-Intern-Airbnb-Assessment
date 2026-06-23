@@ -1,0 +1,43 @@
+pipeline:
+  data_dir: ./data
+  raw_dir: ./data/raw
+  processed_dir: ./data/processed
+  output_format: parquet
+  log_level: INFO
+
+cities:
+  - name: new_york_city
+    code: nyc
+    country: usa
+    url_base: https://data.insideairbnb.com/united-states/ny/new-york-city
+    snapshot_date: 2025-12-14
+    notes: "Active STR regulation (Local Law 18)"
+
+  - name: barcelona
+    code: bcn
+    country: spain
+    url_base: https://data.insideairbnb.com/spain/catalonia/barcelona
+    snapshot_date: 2025-12-14
+    notes: "2028 ban announcement, significant regulatory pressure"
+
+  - name: edinburgh
+    code: edi
+    country: uk
+    url_base: https://data.insideairbnb.com/united-kingdom/scotland/edinburgh
+    snapshot_date: 2025-09-21
+    notes: "Licensing scheme implementation"
+
+processing:
+  price_currency: USD
+  date_format: "%Y-%m-%d"
+  missing_value_strategy: explicit_nulls
+  outlier_method: iqr
+  outlier_threshold: 1.5
+
+validation:
+  price_min: 0
+  price_max: 10000
+  availability_min: 0
+  availability_max: 365
+  min_nights_min: 1
+  min_nights_max: 365
