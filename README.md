@@ -61,16 +61,8 @@ python -m venv venv
 # Windows
 venv\Scripts\activate
 
-# Linux / Mac
-# source venv/bin/activate
-
 # Install dependencies
 pip install -r requirements.txt
-
-# Configure environment (for LLM features)
-cp .env.example .env
-
-# Add your API keys if using OpenAI/Anthropic
 ```
 
 ---
@@ -272,27 +264,6 @@ The complete analysis is documented in `reports/final_report.md`, including:
 * Cross-city comparison
 * AI usage disclosure
 * Decision log
-
----
-
-# AI Usage Disclosure
-
-AI tools were used responsibly as development assistants:
-
-* **DeepSeek**: Code structure, debugging, report template
-* **Claude**: Pipeline design, statistical explanation
-* **GitHub Copilot**: Code completion, function generation
-
-All AI-generated outputs were critically reviewed, validated, and modified where necessary. Full disclosure is available in `reports/ai_disclosure.md`.
-
----
-
-# Limitations
-
-* Calendar availability is a proxy for actual bookings
-* Quarterly snapshots miss daily market dynamics
-* No transaction data available
-* Regulatory attribution is qualitative, not causal
 
 ---
 
